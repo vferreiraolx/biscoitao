@@ -1,100 +1,36 @@
 # 🍪 Biscoitão
 
-Sistema de consolidação de dados de receita do Grupo OLX para consultas via IA Toqan.
+Consolida dados de receita OLX em uma aba única e integra inteligência artificial via API Toqan.
 
-## O que faz
+## Como usar
 
-Pega dados de receita espalhados em várias abas de uma planilha e consolida tudo em uma aba única, organizados por mês, para a IA conseguir responder perguntas sobre receita de forma rápida e precisa.
+### Consolidação de Receitas
+1. **Apps Script:** Cole o código de `biscoitao.gs`
+2. **Planilha:** https://docs.google.com/spreadsheets/d/1UZlUinLJOVtMFFGwJu1A8rr-5QNzG0FoFWPtkPTwrSs/edit
+3. **Execute:** `consolidarReceita()`
 
-## Como funciona
+### Assistente IA (Toqan)
+1. **Configure a chave:** Execute `configurarChaveToqan("SUA_CHAVE_API")` no editor
+2. **Use na planilha:** Digite `=perguntarToqan("sua pergunta")` em qualquer célula
+3. **Aguarde:** A resposta aparecerá automaticamente na célula abaixo
 
-1. **Detecta automaticamente** abas com dados de receita na planilha
-2. **Consolida os dados** em formato mensal na aba "Consolidado_Temporal"  
-3. **Prepara tudo** para a IA Toqan consultar via API
-4. **Roda diariamente** de forma automática
-5. **Envia notificação** quando termina ou dá erro
+## Estrutura
 
-## Setup rápido
+- **Entrada:** Abas com colunas `data` e `receita`
+- **Saída:** Aba `Consolidado_Temporal` com totais mensais
+- **IA:** Respostas inteligentes via Toqan API
 
-### 1. Configure no Google Apps Script
+## Funções
 
-- Acesse [script.google.com](https://script.google.com)
-- Novo projeto → cole o código de `src/main.gs` e `config/constants.gs`
+- `perguntarToqan(pergunta)` - Consulta o assistente IA
+- `configurarChaveToqan(chave)` - Configura autenticação segura
+- `testarToqanEditor()` - Diagnóstico de conexão
 
-### 2. Configure os IDs
+## Integração Toqan
 
-Edite em `constants.gs`:
+A conexão com a API Toqan utiliza o padrão:
+1. **POST** `/create_conversation` - Inicia conversa
+2. **GET** `/get_answer` - Busca resposta via polling com query parameters
 
-```javascript
-const RECURSOS_OLX = {
-  SPREADSHEET_DADOS_RECEITA: 'COLE_ID_DA_PLANILHA_AQUI',
-  // outros IDs conforme necessário
-};
-```
-
-### 3. Configure propriedades do script
-
-No Apps Script → Configurações → Propriedades do script:
-
-```text
-EMAIL_ADMIN = seu.email@grupoolx.com
-TOQAN_API_TOKEN = seu_token_aqui
-```
-
-### 4. Teste
-
-Execute no Apps Script:
-
-```javascript
-// Validar sistema
-validarSistemaOLX();
-
-// Primeira consolidação  
-funcaoPrincipal();
-```
-
-## Estrutura dos dados
-
-### Entrada (suas abas)
-
-Qualquer aba com colunas como: data, receita, produto, região, etc.
-
-### Saída (aba "Consolidado_Temporal")
-
-Uma linha por mês com todas as métricas consolidadas:
-
-```text
-mes_ano | data_atualizacao | rec_receita | rec_produto | reg_regiao | ...
-2024-01 | 21/08/2025       | 180000      | 100000      | 80000      | ...
-```
-
-## Principais funções
-
-- `funcaoPrincipal()` - Executa consolidação completa
-- `detectarAbasReceita()` - Encontra abas com dados
-- `validarSistemaOLX()` - Verifica se está tudo configurado
-- `logarExecucao(nivel, msg)` - Sistema de logs
-
-## Automação
-
-O sistema roda automaticamente todo dia. Para configurar:
-
-```javascript
-// No Apps Script
-ScriptApp.newTrigger('funcaoPrincipal')
-  .timeBased()
-  .everyDays(1)
-  .atHour(8)
-  .create();
-```
-
-## Se der erro
-
-1. Execute `validarSistemaOLX()` para ver o que está faltando
-2. Verifique os logs no console do Apps Script
-3. Confirme se os IDs das planilhas estão corretos
-
----
-
-**Projeto interno Grupo OLX** - Última atualização: 21/08/2025
+**OLX Internal** - 21/08/2025
 
