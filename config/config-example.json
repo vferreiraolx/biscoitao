@@ -1,0 +1,128 @@
+{
+  "projeto": {
+    "nome": "Biscoitão",
+    "versao": "1.0.0",
+    "descricao": "Sistema de automação em Google Apps Script",
+    "ambiente": "desenvolvimento"
+  },
+  
+  "recursos": {
+    "planilhas": {
+      "principal": "SUBSTITUA_PELO_ID_DA_PLANILHA_PRINCIPAL",
+      "logs": "SUBSTITUA_PELO_ID_DA_PLANILHA_LOGS",
+      "configuracao": "SUBSTITUA_PELO_ID_DA_PLANILHA_CONFIGURACAO"
+    },
+    
+    "pastas_drive": {
+      "entrada": "SUBSTITUA_PELO_ID_DA_PASTA_ENTRADA",
+      "saida": "SUBSTITUA_PELO_ID_DA_PASTA_SAIDA", 
+      "backup": "SUBSTITUA_PELO_ID_DA_PASTA_BACKUP",
+      "temporaria": "SUBSTITUA_PELO_ID_DA_PASTA_TEMPORARIA"
+    }
+  },
+  
+  "email": {
+    "administrador": "admin@exemplo.com",
+    "suporte": "suporte@exemplo.com",
+    "limite_diario": 100,
+    "enviar_alertas": true,
+    "template_padrao": "notificacao_simples"
+  },
+  
+  "execucao": {
+    "max_tentativas": 3,
+    "timeout_segundos": 300,
+    "intervalo_retry_segundos": 5,
+    "tamanho_lote": 100,
+    "usar_cache": true
+  },
+  
+  "logs": {
+    "nivel": "INFO",
+    "manter_dias": 30,
+    "salvar_planilha": true,
+    "alertas_criticos": true,
+    "max_entradas_memoria": 1000
+  },
+  
+  "backup": {
+    "frequencia_horas": 24,
+    "manter_dias": 7,
+    "incluir_configuracoes": true,
+    "incluir_logs": false,
+    "compressao": false
+  },
+  
+  "monitoramento": {
+    "ativo": true,
+    "intervalo_verificacao_minutos": 60,
+    "alertar_falhas": true,
+    "metricas_performance": true,
+    "relatorio_diario": true
+  },
+  
+  "apis_habilitadas": [
+    "sheets",
+    "drive", 
+    "gmail",
+    "calendar"
+  ],
+  
+  "triggers": {
+    "principal": {
+      "tipo": "tempo",
+      "frequencia": "diario",
+      "hora": 9,
+      "ativo": true
+    },
+    "manutencao": {
+      "tipo": "tempo", 
+      "frequencia": "semanal",
+      "dia": "segunda",
+      "hora": 6,
+      "ativo": true
+    },
+    "monitoramento": {
+      "tipo": "tempo",
+      "frequencia": "horas",
+      "intervalo": 1,
+      "ativo": false
+    }
+  },
+  
+  "validacao": {
+    "verificar_permissoes": true,
+    "validar_dados_entrada": true,
+    "formato_email": true,
+    "campos_obrigatorios": ["id", "nome", "email"],
+    "tamanho_max_string": 1000
+  },
+  
+  "formatacao": {
+    "formato_data": "dd/MM/yyyy",
+    "formato_hora": "HH:mm:ss",
+    "locale": "pt-BR",
+    "timezone": "America/Sao_Paulo"
+  },
+  
+  "limites": {
+    "max_registros_processamento": 10000,
+    "max_arquivos_pasta": 1000,
+    "max_tamanho_arquivo_mb": 50,
+    "max_linhas_planilha": 100000
+  },
+  
+  "development": {
+    "debug_mode": true,
+    "verbose_logging": true,
+    "mock_apis": false,
+    "test_data": true
+  },
+  
+  "production": {
+    "debug_mode": false,
+    "verbose_logging": false,
+    "mock_apis": false,
+    "test_data": false
+  }
+}
