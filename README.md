@@ -1,177 +1,100 @@
 # 🍪 Biscoitão
 
-Sistema de consolidação de dados de receita do Grupo OLX para interface conversacional com IA.
+Sistema de consolidação de dados de receita do Grupo OLX para consultas via IA Toqan.
 
-## 📋 Índice
+## O que faz
 
-- [Sobre o Projeto](#sobre-o-projeto)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Configuração Inicial](#configuração-inicial)
-- [Como Usar](#como-usar)
-- [Desenvolvimento](#desenvolvimento)
-- [Contribuição](#contribuição)
-- [Recursos Úteis](#recursos-úteis)
+Pega dados de receita espalhados em várias abas de uma planilha e consolida tudo em uma aba única, organizados por mês, para a IA conseguir responder perguntas sobre receita de forma rápida e precisa.
 
-## 📝 Sobre o Projeto
+## Como funciona
 
-O Biscoitão consolida informações de receita espalhadas em múltiplas fontes de dados, criando uma base unificada para consultas conversacionais via IA (Toqan).
+1. **Detecta automaticamente** abas com dados de receita na planilha
+2. **Consolida os dados** em formato mensal na aba "Consolidado_Temporal"  
+3. **Prepara tudo** para a IA Toqan consultar via API
+4. **Roda diariamente** de forma automática
+5. **Envia notificação** quando termina ou dá erro
 
-### Principais Funcionalidades
+## Setup rápido
 
-- **Consolidação Automática**: Unifica dados de múltiplas abas em formato temporal mensal
-- **Validação Inteligente**: Sistema autônomo de verificação de qualidade dos dados
-- **Interface com IA**: Preparação de dados para consumo pela LLM Toqan
-- **Monitoramento Proativo**: Detecção automática de mudanças e notificações
-- **Integração APIs**: Conexão com sistemas externos (CRMs, ERPs)
+### 1. Configure no Google Apps Script
 
-## 🏗️ Estrutura do Projeto
+- Acesse [script.google.com](https://script.google.com)
+- Novo projeto → cole o código de `src/main.gs` e `config/constants.gs`
 
-```
-Biscoitão/
-├── 📁 src/               # Código-fonte principal
-│   └── main.gs          # Arquivo principal do Apps Script
-├── 📁 config/           # Arquivos de configuração
-├── 📁 docs/             # Documentação detalhada
-├── 📄 appsscript.json   # Manifest do Google Apps Script
-├── 📄 README.md         # Documentação principal (este arquivo)
-└── 📄 .gitignore        # Arquivos ignorados pelo Git
+### 2. Configure os IDs
+
+Edite em `constants.gs`:
+
+```javascript
+const RECURSOS_OLX = {
+  SPREADSHEET_DADOS_RECEITA: 'COLE_ID_DA_PLANILHA_AQUI',
+  // outros IDs conforme necessário
+};
 ```
 
-### Descrição das Pastas
+### 3. Configure propriedades do script
 
-| Pasta | Descrição |
-|-------|-----------|
-| `src/` | Contém todo o código-fonte do projeto |
-| `config/` | Arquivos de configuração, templates e constantes |
-| `docs/` | Documentação técnica detalhada |
+No Apps Script → Configurações → Propriedades do script:
 
-## ⚙️ Configuração Inicial
+```text
+EMAIL_ADMIN = seu.email@grupoolx.com
+TOQAN_API_TOKEN = seu_token_aqui
+```
 
-### Pré-requisitos
+### 4. Teste
 
-- Conta Google com privilégios administrativos
-- Acesso às planilhas de dados de receita do Grupo OLX
-- Tokens de API da LLM Toqan
-- Permissões para integração com sistemas externos
+Execute no Apps Script:
 
-### Instalação
+```javascript
+// Validar sistema
+validarSistemaOLX();
 
-1. **Clone o repositório**
+// Primeira consolidação  
+funcaoPrincipal();
+```
 
-   ```bash
-   git clone [URL_DO_REPOSITORIO]
-   cd Biscoitão
-   ```
+## Estrutura dos dados
 
-2. **Configure o Google Apps Script**
-   - Acesse [script.google.com](https://script.google.com)
-   - Crie um novo projeto
-   - Copie o conteúdo dos arquivos da pasta `src/`
+### Entrada (suas abas)
 
-3. **Configure as integrações**
-   - APIs: Google Sheets, Drive, Gmail
-   - Tokens da LLM Toqan
-   - Credenciais de sistemas externos
+Qualquer aba com colunas como: data, receita, produto, região, etc.
 
-## 🚀 Como Usar
+### Saída (aba "Consolidado_Temporal")
 
-### Fluxo Principal
+Uma linha por mês com todas as métricas consolidadas:
 
-1. **Consolidação Automática**: Sistema processa abas de dados diariamente
-2. **Validação**: Verificação automática de qualidade e consistência
-3. **Interface IA**: Dados preparados para consultas via Toqan
-4. **Monitoramento**: Notificações sobre status e atualizações
+```text
+mes_ano | data_atualizacao | rec_receita | rec_produto | reg_regiao | ...
+2024-01 | 21/08/2025       | 180000      | 100000      | 80000      | ...
+```
 
-### Execução Manual
+## Principais funções
 
-- Acesse Google Apps Script
-- Execute `funcaoPrincipal()` para consolidação completa
-- Execute `executarTestes()` para validação do sistema
+- `funcaoPrincipal()` - Executa consolidação completa
+- `detectarAbasReceita()` - Encontra abas com dados
+- `validarSistemaOLX()` - Verifica se está tudo configurado
+- `logarExecucao(nivel, msg)` - Sistema de logs
 
-## 👨‍💻 Desenvolvimento
+## Automação
 
-### Estrutura de Código
+O sistema roda automaticamente todo dia. Para configurar:
 
-O projeto segue as seguintes convenções:
+```javascript
+// No Apps Script
+ScriptApp.newTrigger('funcaoPrincipal')
+  .timeBased()
+  .everyDays(1)
+  .atHour(8)
+  .create();
+```
 
-- **Nomenclatura**: camelCase para funções e variáveis
-- **Constantes**: UPPER_SNAKE_CASE
-- **Arquivos**: Organizados por funcionalidade
+## Se der erro
 
-### Adicionando Nova Funcionalidade
-
-1. Crie uma nova função em `src/main.gs`
-2. Documente a função com comentários JSDoc
-3. Teste a funcionalidade
-4. Atualize esta documentação
-
-### Estrutura de Dados
-
-- **Abas de Entrada**: Dados de receita por produto, região, período
-- **Aba Consolidada**: Fluxo temporal mensal unificado
-- **Logs**: Registro de execuções e validações
-- **Configurações**: Parâmetros e credenciais do sistema
-
-### Integração com IA
-
-- **Toqan LLM**: Interface conversacional para consultas
-- **Contexto Expandido**: Suporte a planilhas, PDFs, documentos
-- **API Bidirecional**: Leitura e escrita em Google Workspace
-
-## 🔧 Troubleshooting
-
-### Problemas Comuns
-
-| Problema | Solução |
-|----------|---------|
-| Erro de permissão | Verifique se as APIs necessárias estão habilitadas |
-| Timeout de execução | Otimize o código ou use execução assíncrona |
-| Limite de cota | Verifique os limites do Google Apps Script |
-
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## 📚 Recursos Úteis
-
-- [Documentação Google Apps Script](https://developers.google.com/apps-script)
-- [Referência da API](https://developers.google.com/apps-script/reference)
-- [Guia de Melhores Práticas](https://developers.google.com/apps-script/guides/support/best-practices)
-- [Google Apps Script CLI (clasp)](https://github.com/google/clasp)
-
-## 📄 Licença
-
-Projeto interno do Grupo OLX
+1. Execute `validarSistemaOLX()` para ver o que está faltando
+2. Verifique os logs no console do Apps Script
+3. Confirme se os IDs das planilhas estão corretos
 
 ---
 
-**📧 Contato**: Equipe de Dados OLX  
-**🔗 Repositório**: https://github.com/vferreiraolx/biscoitao  
-**📅 Última atualização**: 21 de agosto de 2025
+**Projeto interno Grupo OLX** - Última atualização: 21/08/2025
 
-## 🎯 Status do Projeto
-
-### ✅ Implementado
-- Estrutura completa de documentação
-- Sistema de detecção automática de abas
-- Consolidação temporal mensal
-- Integração com IA Toqan
-- Sistema de logging e notificações
-- Validação automônoma de dados
-
-### 🔄 Em Desenvolvimento
-- Conexões com APIs externas (CRM, ERP)
-- Notificações via Slack
-- Sistema de backup automático
-- Dashboard de monitoramento
-
-### 📋 Próximos Passos
-1. Configurar IDs das planilhas OLX
-2. Configurar token da API Toqan
-3. Testar detecção de abas
-4. Executar primeira consolidação
-5. Integrar com sistema de notificações
