@@ -1,36 +1,80 @@
 # 🍪 Biscoitão
 
-Consolida dados de receita OLX em uma aba única e integra inteligência artificial via API Toqan.
+Assistente inteligente que conecta analistas OLX ao datalake via consultas conversacionais, permitindo análises de receita e métricas através de perguntas em linguagem natural.
+
+## Visão Geral
+
+O Biscoitão integra:
+
+- **Frontend:** Google Sheets + Apps Script (interface familiar aos analistas)
+- **Backend:** Flask + PyHive (conexão direta ao datalake OLX via Trino)
+- **IA:** API Toqan (interpretação de perguntas e formatação de respostas)
+- **Dados:** Acesso direto às tabelas do datalake (dw.monetization_total, etc.)
 
 ## Como usar
 
-### Consolidação de Receitas
-1. **Apps Script:** Cole o código de `biscoitao.gs`
-2. **Planilha:** https://docs.google.com/spreadsheets/d/1UZlUinLJOVtMFFGwJu1A8rr-5QNzG0FoFWPtkPTwrSs/edit
-3. **Execute:** `consolidarReceita()`
+### Configuração Inicial
 
-### Assistente IA (Toqan)
-1. **Configure a chave:** Execute `configurarChaveToqan("SUA_CHAVE_API")` no editor
-2. **Use na planilha:** Digite `=perguntarToqan("sua pergunta")` em qualquer célula
-3. **Aguarde:** A resposta aparecerá automaticamente na célula abaixo
+1. **Configure credenciais:** Adicione `.env` com suas credenciais do Trino
+2. **Instale dependências:** `pip install flask pyhive pandas python-dotenv`
+3. **Inicie o backend:** `python app.py` (roda na porta 5000)
+4. **Configure Apps Script:** Execute `configurarChaveToqan("SUA_CHAVE_API")` no editor
 
-## Estrutura
+### Fazendo Consultas
 
-- **Entrada:** Abas com colunas `data` e `receita`
-- **Saída:** Aba `Consolidado_Temporal` com totais mensais
-- **IA:** Respostas inteligentes via Toqan API
+1. **Na planilha:** Digite `=perguntarToqan("sua pergunta")` em qualquer célula
+2. **Exemplos de perguntas:**
+   - "Qual foi a receita de dezembro de 2023?"
+   - "Compare receita Q1 vs Q2 deste ano"
+   - "Mostre a tendência dos últimos 6 meses"
+   - "Quais categorias tiveram maior crescimento?"
+
+### Tipos de Resposta
+
+- **Respostas textuais:** Análises e insights em linguagem natural
+- **Tabelas condensadas:** Dados relevantes formatados e sumarizados
+- **Gráficos:** Visualizações quando apropriado (futuro)
+- **Sumarização automática:** O backend interpreta perguntas sobre soma de vendas e retorna o resultado textual no campo `summary` da resposta JSON
+
+## Arquitetura Técnica
+
+### Fluxo de Dados
+
+```text
+Pergunta (Sheets) → Toqan (interpretação) → Flask (PyHive) → Datalake → 
+DataProcessor (otimização) → Sumarização automática → Toqan (formatação) → Resposta (Sheets)
+```
+
+### Processamento de Dados
+
+- **≤50k linhas:** Envio direto para LLM
+- **50k-500k linhas:** Chunking inteligente (temporal/categórico)
+- **Otimizações:** Context filtering, token optimization, precisão de floats
+- **Sumarização:** Backend calcula e retorna respostas textuais para perguntas de soma de vendas
+
+### Infraestrutura
+
+- **Atual:** Notebook corporativo local (desenvolvimento/protótipo)
+- **Futuro:** AWS (produção, conforme sucesso do protótipo)
 
 ## Funções
 
-- `perguntarToqan(pergunta)` - Consulta o assistente IA
+- `perguntarToqan(pergunta)` - Consulta conversacional ao datalake
 - `configurarChaveToqan(chave)` - Configura autenticação segura
 - `testarToqanEditor()` - Diagnóstico de conexão
 
-## Integração Toqan
+## Integração APIs
 
-A conexão com a API Toqan utiliza o padrão:
+### Toqan (IA Conversacional)
+
 1. **POST** `/create_conversation` - Inicia conversa
-2. **GET** `/get_answer` - Busca resposta via polling com query parameters
+2. **GET** `/get_answer` - Busca resposta via polling
 
-**OLX Internal** - 21/08/2025
+### Backend Flask (Datalake)
+
+1. **POST** `/query` - Executa consultas no datalake
+2. **Payload:** `{"question": "pergunta do usuário"}`
+3. **Response:** Dados otimizados para contexto LLM, incluindo campo `summary` com resposta interpretativa
+
+**OLX Internal** - 22/08/2025
 

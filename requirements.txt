@@ -1,0 +1,32 @@
+# Biscoitão - Dependências Python
+# Sistema de Análise Inteligente de Dados OLX
+
+# Core data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Database connectivity
+pyhive>=0.6.5
+thrift>=0.16.0
+thrift-sasl>=0.4.3
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Web and API
+flask>=2.3.0
+requests>=2.31.0
+
+# Environment and utilities
+python-dotenv>=1.0.0
+openpyxl>=3.1.0
+
+# Google Cloud (for future API deployment)
+google-cloud-functions-framework>=3.5.0
+google-cloud-secret-manager>=2.16.0
+
+# Development and testing
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
